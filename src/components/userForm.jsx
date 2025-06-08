@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { countries } from '../data';
+import { countries, countryPhoneCodes } from '../data';
 
 const initialData = {
   firstName: '', lastName: '', username: '', email: '', password: '',
@@ -13,9 +13,9 @@ const UserForm = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
-  const validate = () => {
+  const validate = (data = formData) => {
     const errs = {};
-    const { firstName, lastName, username, email, password, phoneCode, phoneNumber, country, city, pan, aadhar } = formData;
+    const { firstName, lastName, username, email, password, phoneCode, phoneNumber, country, city, pan, aadhar } = data;
 
     if (!firstName.trim()) errs.firstName = "First Name is required.";
     if (!lastName.trim()) errs.lastName = "Last Name is required.";
@@ -32,17 +32,38 @@ const UserForm = () => {
     return errs;
   };
 
-  const isFormValid = () => {
-    const errs = validate();
-    return Object.keys(errs).length === 0;
-  };
-
   const handleChange = ({ target: { name, value } }) => {
-    const updatedFormData = { ...formData, [name]: value };
-    setFormData(updatedFormData);
-    const newErrors = validate();
+    let updatedData = { ...formData, [name]: value };
+
+    if (name === "country") {
+      const code = countryPhoneCodes[value];
+      if (code) {
+        updatedData.phoneCode = code;
+      
+      }
+    }
+
+    if (name === "phoneCode") {
+      const matchedCountry = Object.entries(countryPhoneCodes).find(
+        ([country, code]) => code === value
+      );
+      if (matchedCountry) {
+        updatedData.country = matchedCountry[0];
+      
+      }
+    }
+
+    setFormData(updatedData);
+
+
+    const newErrors = validate(updatedData);
     setErrors(newErrors);
   };
+
+  
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, city: '' }));
+  }, [formData.country]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,6 +73,11 @@ const UserForm = () => {
       navigate('/completion', { state: formData });
     }
   };
+
+  
+  const isSubmitDisabled =
+    Object.keys(errors).length > 0 ||
+    Object.values(formData).some(value => value === '');
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-12 font-sans">
@@ -168,9 +194,9 @@ const UserForm = () => {
 
         <button
           type="submit"
-          disabled={!isFormValid()}
+          disabled={isSubmitDisabled}
           className={`w-full py-4 font-semibold text-white text-lg rounded-lg transition duration-300 ${
-            isFormValid() ? 'bg-teal-600 hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'
+            isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-teal-600 hover:bg-teal-700'
           }`}
         >
           Submit
@@ -180,14 +206,12 @@ const UserForm = () => {
   );
 };
 
-// Reusable Section Title
 const SectionTitle = ({ title }) => (
   <h3 className="text-xl font-semibold text-gray-800 mb-5 border-l-4 border-teal-500 pl-3">
     {title}
   </h3>
 );
 
-// Reusable Input Field
 const InputField = ({ label, name, value, onChange, error, type = 'text', placeholder = '', className = '', required = false }) => (
   <div className={className}>
     <label className="block mb-1 text-gray-700 font-medium">
@@ -205,7 +229,6 @@ const InputField = ({ label, name, value, onChange, error, type = 'text', placeh
   </div>
 );
 
-// Reusable Dropdown Field
 const DropdownField = ({ label, name, options, value, onChange, error, required = false }) => (
   <div>
     <label className="block mb-1 text-gray-700 font-medium">

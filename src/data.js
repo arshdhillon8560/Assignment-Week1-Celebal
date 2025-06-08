@@ -56,3 +56,20 @@ export const countries = {
     'Bari', 'Catania', 'Venice', 'Verona', 'Messina', 'Padua', 'Trieste'
   ],
 };
+
+export const countryPhoneCodes = {
+  India: "+91",
+  USA: "+1",
+  Canada: "+1",
+  UnitedKingdom: "+44",
+  Australia: "+61",
+  Germany: "+49",
+  France: "+33",
+  Japan: "+81",
+  China: "+86",
+  Brazil: "+55",
+  SouthAfrica: "+27",
+  Russia: "+7",
+  Mexico: "+52",
+  Italy: "+39",
+};
