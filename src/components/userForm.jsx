@@ -28,12 +28,20 @@ const UserForm = () => {
     if (!city) errs.city = "City is required.";
     if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) errs.pan = "PAN must be 10 characters (ABCDE1234F).";
     if (!/^\d{12}$/.test(aadhar)) errs.aadhar = "Aadhar must be 12-digit number.";
-    
+
     return errs;
   };
 
+  const isFormValid = () => {
+    const errs = validate();
+    return Object.keys(errs).length === 0;
+  };
+
   const handleChange = ({ target: { name, value } }) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+    const newErrors = validate();
+    setErrors(newErrors);
   };
 
   const handleSubmit = (e) => {
@@ -160,9 +168,10 @@ const UserForm = () => {
 
         <button
           type="submit"
-          disabled={Object.keys(errors).length > 0}
-          className={`w-full py-4 font-semibold text-white text-lg rounded-lg transition duration-300
-            ${Object.keys(errors).length ? 'bg-gray-400 cursor-not-allowed' : 'bg-teal-600 hover:bg-teal-700'}`}
+          disabled={!isFormValid()}
+          className={`w-full py-4 font-semibold text-white text-lg rounded-lg transition duration-300 ${
+            isFormValid() ? 'bg-teal-600 hover:bg-teal-700' : 'bg-gray-400 cursor-not-allowed'
+          }`}
         >
           Submit
         </button>

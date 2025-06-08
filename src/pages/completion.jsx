@@ -5,7 +5,7 @@ const Completion = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  if (!state) 
+  if (!state) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
         <div className="bg-white p-8 rounded-xl shadow-lg max-w-md text-center">
@@ -19,6 +19,7 @@ const Completion = () => {
         </div>
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
@@ -30,7 +31,9 @@ const Completion = () => {
           {Object.entries(state).map(([key, value]) => (
             <li key={key} className="py-3 flex justify-between">
               <span className="capitalize font-semibold text-gray-700">{formatLabel(key)}</span>
-              <span className="text-gray-900">{value}</span>
+              <span className="text-gray-900">
+                {key === 'password' ? '******' : value}
+              </span>
             </li>
           ))}
         </ul>
@@ -45,12 +48,9 @@ const Completion = () => {
   );
 };
 
-
-const formatLabel = (label) => {
-  
-  return label
+const formatLabel = (label) =>
+  label
     .replace(/([A-Z])/g, ' $1')
     .replace(/^./, str => str.toUpperCase());
-};
 
 export default Completion;
